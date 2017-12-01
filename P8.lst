@@ -1,0 +1,252 @@
+SQL> COMMIT
+  2  ;
+
+Commit complete.
+
+SQL> CREATE TABLE TITULACION(T CHAR(4) PRIMARY KEY,FAC VARCHAR2(50) NOT NULL)
+  2  ;
+
+Table created.
+
+SQL> INSERT INTO TITULACION(T)
+  2  SELECT T UNIQUE FROM ASIGNATURA
+  3  
+SQL> 
+SQL> 
+SQL> SELECT T UNIQUE FROM ASIGNATURA
+  2  ;
+SELECT T UNIQUE FROM ASIGNATURA
+         *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected 
+
+
+SQL> SELECT UNIQUE T FROM ASIGNATURA;
+
+T                                                                               
+----                                                                            
+GF                                                                              
+GM                                                                              
+GII                                                                             
+MII                                                                             
+
+SQL> INSERT INTO TITULACION(T)
+  2  SELECT UNIQUE T FROM ASIGNATURA;
+INSERT INTO TITULACION(T)
+*
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("ALU0100763478"."TITULACION"."FAC") 
+
+
+SQL> INSERT INTO TITULACION(T)
+  2  SELECT T FROM ASIGNATURA;
+INSERT INTO TITULACION(T)
+*
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("ALU0100763478"."TITULACION"."FAC") 
+
+
+SQL> DROP TABLE TITULACION
+  2  ;
+
+Table dropped.
+
+SQL> CREATE TABLE TITULACION(T CHAR(4) PRIMARY KEY,FAC VARCHAR2(50))
+  2  ;
+
+Table created.
+
+SQL> INSERT INTO TITULACION(T)
+  2  SELECT UNIQUE T FROM ASIGNATURA;
+
+4 rows created.
+
+SQL> SELECT * FROM TITULACION
+  2  ;
+
+T    FAC                                                                        
+---- --------------------------------------------------                         
+GF                                                                              
+GM                                                                              
+GII                                                                             
+MII                                                                             
+
+SQL> UPDATE TITULACION
+  2  SET FAC=$facultad
+  3  WHERE T=
+  4  
+SQL> 
+SQL> 
+SQL> UPDATE TITULACION
+  2  SET FAC=&facultad
+  3  WHERE T=&titulacion;
+Enter value for facultad: FACULTAD DE FISICA
+old   2: SET FAC=&facultad
+new   2: SET FAC=FACULTAD DE FISICA
+Enter value for titulacion: GF
+old   3: WHERE T=&titulacion
+new   3: WHERE T=GF
+SET FAC=FACULTAD DE FISICA
+                 *
+ERROR at line 2:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> UPDATE TITULACION
+  2  SET FAC=&facultad
+  3  WHERE T=&titulacion
+  4  ;
+Enter value for facultad: 'FACULTAD DE FISICA'
+old   2: SET FAC=&facultad
+new   2: SET FAC='FACULTAD DE FISICA'
+Enter value for titulacion: 'GF'
+old   3: WHERE T=&titulacion
+new   3: WHERE T='GF'
+
+1 row updated.
+
+SQL> RUN
+  1  UPDATE TITULACION
+  2  SET FAC=&facultad
+  3  WHERE T=&titulacion
+  4* 
+Enter value for facultad: 'FACULTAD DE MATEMATICAS'
+old   2: SET FAC=&facultad
+new   2: SET FAC='FACULTAD DE MATEMATICAS'
+Enter value for titulacion: 'GM'
+old   3: WHERE T=&titulacion
+new   3: WHERE T='GM'
+
+1 row updated.
+
+SQL> RUN
+  1  UPDATE TITULACION
+  2  SET FAC=&facultad
+  3  WHERE T=&titulacion
+  4* 
+Enter value for facultad: 'FACULTAD DE INGENIERIA INFORMATICA'
+old   2: SET FAC=&facultad
+new   2: SET FAC='FACULTAD DE INGENIERIA INFORMATICA'
+Enter value for titulacion: 'GII'
+old   3: WHERE T=&titulacion
+new   3: WHERE T='GII'
+
+1 row updated.
+
+SQL> RUN
+  1  UPDATE TITULACION
+  2  SET FAC=&facultad
+  3  WHERE T=&titulacion
+  4* 
+Enter value for facultad: 'FACULTAD DE INGENIERIA INFORMATICA'
+old   2: SET FAC=&facultad
+new   2: SET FAC='FACULTAD DE INGENIERIA INFORMATICA'
+Enter value for titulacion: 'MII'
+old   3: WHERE T=&titulacion
+new   3: WHERE T='MII'
+
+1 row updated.
+
+SQL> SELECT * FROM TITULACION
+  2  ;
+
+T    FAC                                                                        
+---- --------------------------------------------------                         
+GF   FACULTAD DE FISICA                                                         
+GM   FACULTAD DE MATEMATICAS                                                    
+GII  FACULTAD DE INGENIERIA INFORMATICA                                         
+MII  FACULTAD DE INGENIERIA INFORMATICA                                         
+
+SQL> CREATE SYNONYM TIT FOR TITULACION
+  2  ;
+
+Synonym created.
+
+SQL> SELECT * FROM TIT
+  2  ;
+
+T    FAC                                                                        
+---- --------------------------------------------------                         
+GF   FACULTAD DE FISICA                                                         
+GM   FACULTAD DE MATEMATICAS                                                    
+GII  FACULTAD DE INGENIERIA INFORMATICA                                         
+MII  FACULTAD DE INGENIERIA INFORMATICA                                         
+
+SQL> ALTER TABLE ASIGNATURA
+  2  ADD CONSTRAINT FK_ASIGNATURA_T
+  3  FOREIGN KEY(T) REFERENCES TITULACION
+  4  ON DELETE CASCADE;
+
+Table altered.
+
+SQL> ALTER TABLE TITULACION
+  2  MODIFY T CHAR(6);
+ALTER TABLE TITULACION
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (ALU0100763478.FK_ASIGNATURA_T) violated - 
+child record found 
+
+
+SQL> DISABLE CONSTRAINT FK_ASIGNATURA_T;
+SP2-0734: unknown command beginning "DISABLE CO..." - rest of line ignored.
+SQL> DISABLE FK_ASIGNATURA_T CONSTRAINT;
+SP2-0734: unknown command beginning "DISABLE FK..." - rest of line ignored.
+SQL> DISABLE CONSTRAINT;
+SP2-0734: unknown command beginning "DISABLE CO..." - rest of line ignored.
+SQL> ALTER TABLE TITULACION
+  2  ADD CONSTRAINT FK_ASIGNATURA_T
+  3  DISABLE CONSTRAINT;
+DISABLE CONSTRAINT
+                 *
+ERROR at line 3:
+ORA-02250: missing or invalid constraint name 
+
+
+SQL> ALTER TABLE TITULACION
+  2  DISABLE CONSTRAINT FK_ASIGNATURA_T;
+ALTER TABLE TITULACION
+*
+ERROR at line 1:
+ORA-02431: cannot disable constraint (FK_ASIGNATURA_T) - no such constraint 
+
+
+SQL> ALTER TABLE TITULACION
+  2  
+SQL> 
+SQL> 
+SQL> ALTER TABLE ASIGNATURA
+  2  DISABLE CONSTRAINT FK_ASIGNATURA_T;
+
+Table altered.
+
+SQL> ALTER TABLE TITULACION
+  2  MODIFY T CHAR(6);
+
+Table altered.
+
+SQL> ALTER TABLE ASIGNATURA
+  2  ENABLE CONSTRAINT FK_ASIGNATURA_T;
+
+Table altered.
+
+SQL> CREATE VIEW VISTA2 FOR ASIGNATURA(CAS,A,T,CUR,CAR);
+CREATE VIEW VISTA2 FOR ASIGNATURA(CAS,A,T,CUR,CAR)
+                   *
+ERROR at line 1:
+ORA-00905: missing keyword 
+
+
+SQL> CREATE VIEW VISTA2 TO ASIGNATURA(CAS,A,T,CUR,CAR);
+CREATE VIEW VISTA2 TO ASIGNATURA(CAS,A,T,CUR,CAR)
+                   *
+ERROR at line 1:
+ORA-00905: missing keyword 
+
+
+SQL> COMMIT
+  2  ;
+
+Commit complete.
+
+SQL> EXIT
